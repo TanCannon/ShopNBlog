@@ -1,0 +1,97 @@
+This the 102 videos playlist of codewithHarry.
+Admin credentials: Username: Tanmaya, Password: tancannon@2003
+
+...after the 1st tutorial of djnago extra documentation or my journal(what i have learned is written here)
+
+------Adding media directory-------
+When any image is added from the admin panel it goes to a separate directory named "media"; i.e we are saving all the images in a dedicated place within a folder insdie named as the app name (e.g media/shop/images/dustbin.jpg).
+-In the "settings.py" of the main project directory(here "mac") add;
+	MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+	MEDIA_URL = '/media/'
+-Then import these in the main project directory(here "mac");
+	from django.conf import settings
+	from django.conf.urls.static import static
+and add the url as below(the thing starting with + im talking about);
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('shop/', include('shop.urls')),
+    path('blog/', include('blog.urls'))
+] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+
+-------jinga templating(reusing templates)---------
+to copy the code of a html file to another(or in otherwors to resuse the code) we
+use this jinga templating.
+say in 'about.html'
+
+{%extends 'shop/base.html' %} #this means we're reusing the contents of base.html in about.html.
+
+also we can add variable blocks in the parent file (here base.html)
+e.g;
+written in base file (here base.html):
+{% block title%}{% endblock %}
+written in the reusing file (e.g about.html)
+{% block title%} Tancannon Industries {% endblock %}
+
+This replaces the 'Tancannon Industries' at {% block title%}{% endblock %} when reusing and can only be seen in the reusing file i.e about.html.
+
+----adding loop to the carousal or sliders-----------
+Here im fetching the products from the database, so i need to iterate over the product objects fetched from the database.
+
+{% for i in range %}
+<li data-target="#demo" data-slide-to="{{i}}" ></li>
+{% endfor %}
+
+This is used to to make slides whose numbers is equal to "range".
+
+See in shop/views.py:
+
+products = Products.objects.all() //fetching the objects from the databases.
+    print(products)
+    n = len(products)
+    nSlides = n//4 + ceil((n/4)-(n//4)) //formula to get no. of slides(in carousal) needed to show images.
+    params = {
+        'no_of_slides': nSlides,
+        'range': range(nSlides),
+        'product': products
+    } 
+Then;
+<div class="container carousel-inner no-padding">
+
+        <div class="carousel-item active">
+          <div class="col-xs-3 col-sm-3 col-md-3">
+            <div class="card" style="width: 18rem;">
+              <!--<img src='{% static "shop/test.jpg" %}' class="card-img-top" alt="..."> -->
+              <img src='/media/{{product.0.image}}' class="card-img-top" alt="...">
+              <div class="card-body">
+                  <h5 class="card-title">{{product.0.product_name}}</h5>
+                  <p class="card-text">{{product.0.desc}}</p>
+                  <a href="#" class="btn btn-primary">Add to Cart</a>
+              </div>
+            </div>
+        </div>
+The 1st product is hardcoded.
+
+The rest images are loaded into the slides like this using loop;
+
+        {% for i in product|slice:"1:"%}
+        <div class="col-xs-3 col-sm-3 col-md-3">
+          <div class="card" style="width: 18rem;">
+            <img src='/media/{{i.image}}' class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">{{i.product_name}}</h5>
+              <p class="card-text">{{i.desc}}</p>
+              <a href="#" class="btn btn-primary">Add To Cart</a>
+            </div>
+          </div>
+        </div>
+        {% if forloop.counter|divisibleby:3 and forloop.counter > 0 and not forloop.last %}
+      </div>
+      <div class="carousel-item">
+        {% endif %}
+          {% endfor %}
+     </div>
+
+
+
+
+

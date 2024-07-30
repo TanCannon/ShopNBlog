@@ -1,0 +1,138 @@
+{%extends 'blog/basic.html'%}
+{% load extras %}
+{%block body%}
+<main role="main" class="container">
+    <div class="row">
+      <div class="my-2 col-md-8 blog-main">
+        <div class="blog-post">
+          <h2 class="blog-post-title">{{post.tilte}}</h2>
+          <p class="blog-post-meta">{{post.pub_date}}</p>
+          <h2>{{post.head0}}</h2>
+          <p>{{post.chead0}}</p>
+          <h3>{{post.head1}}</h3>
+          <p>{{post.chead1}}</p>
+          <h4>{{post.head2}}</h4>
+          <p>{{post.chead2|safe}}</p>
+        </div><!-- /.blog-post -->
+        
+        {% if user.is_authenticated %}
+        <div class="container px-0">
+          <h2>Comments ({{comments.count}})</h2>
+          <form action="/blog/postcomment/" method="post">
+          {% csrf_token %}
+          <input type="text" name="comment" placeholder="Enter comment here">
+          <input type="hidden" name="postId" value="{{post.post_id}}" >
+          <input type="hidden" name="parentId" value="">
+          <input type="submit" value="Submit">
+         </form>
+         {% else %}
+         <span class="badge badge-secondary"> Please login to comment </span>
+         {% endif %}
+
+         <!--rendering comments-->
+          {% for comment in comments%}         
+          <div class="row my-3 mx-0">
+            <div class="col-md-1  ">
+              <!-- you can add the commenter pic here-->
+              <img class="rounded mx-auto d-block w-100 p-2" src="/media/shop/images/wooden_chappal.jpg"  alt="user">
+            </div>
+            <div class="col-md-11 "> 
+              <b> {{comment.user.username}} </b> at {{comment.timestamp}}
+              <div>   {{comment.comment}} </div>
+          
+          
+          
+              <!--rendering replies-->
+              <div class="reply">
+              {% if user.is_authenticated %}
+                <button class="btn my-2 sm-2 btn-primary" type="button" data-toggle="collapse" data-target="#replyBox{{comment.comment_id}}" aria-expanded="false" aria-controls="replyBox{{comment.comment_id}}">
+                    Reply
+                </button>
+                <div class="collapse my-2" id="replyBox{{comment.comment_id}}">
+                  <div class="card card-body my-2">
+                    <form action="/blog/postcomment/" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="comment">Post a reply </label>
+                            <input type="text" class="form-control" name="comment" placeholder="Enter comment here">
+                            <input type="hidden" name="parentId" value="{{comment.comment_id}}">
+                        </div>
+                        <input type="hidden" name="postId" value="{{post.post_id}}">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                  </div>
+                </div>
+              {% else %}
+                <button class="btn btn-sm btn-secondary disabled my-2" type="button" data-toggle="collapse" data-target="#replyBox{{comment.sno}}" aria-expanded="false" aria-controls="replyBox{{comment.sno}}">
+                    Login to reply
+                </button>
+              {% endif %}  
+              </div>  
+
+              <div class="replies">
+                {% for reply in replyDict|get_val:comment.comment_id %}
+                    <div class="row my-3 mx-0">
+                      <div class="col-md-1  ">
+                         <!--you can add the commenter pic here-->
+                        <img class="rounded mx-auto d-block w-100 p-2" src="/media/shop/images/wooden_chappal.jpg"  alt="user">
+                      </div>
+                      <div class="col-md-11 "> 
+                        <b> {{reply.user.username}} </b> at {{reply.timestamp}}
+                        <div>   {{reply.comment}} </div>
+                      </div>
+                    </div>
+                {% endfor %}   
+              </div>
+            </div>
+        </div>
+       
+        {% endfor %}
+
+
+
+        {% with page_no=post.post_id %} <!--setting a variable-->
+        {% if page_no == 1 %}
+        <nav class="blog-pagination">
+          <a class="btn btn-outline-secondary disabled" href="/blog/blogpost/{{post.post_id|add:"-1"}}">Older</a>
+          <a class="btn btn-outline-primary" href="{{post.post_id|add:"1"}}" tabindex="-1" aria-disabled="true">Newer</a>
+        </nav>
+
+        {% elif page_no == total_posts %}
+        <nav class="blog-pagination">
+          <a class="btn btn-outline-primary" href="/blog/blogpost/{{post.post_id|add:"-1"}}">Older</a>
+          <a class="btn btn-outline-secondary disabled" href="{{post.post_id|add:"1"}}" tabindex="-1" aria-disabled="true">Newer</a>
+        </nav>
+
+        {% else %}
+        <nav class="blog-pagination">
+          <a class="btn btn-outline-primary" href="/blog/blogpost/{{post.post_id|add:"-1"}}">Older</a>
+          <a class="btn btn-outline-primary" href="{{post.post_id|add:"1"}}" tabindex="-1" aria-disabled="true">Newer</a> 
+        </nav>
+
+        {% endif %}
+        {% endwith %} 
+      </div><!-- /.blog-main -->
+  
+      <aside class="col-md-4 blog-sidebar">
+        <div class="p-4 mb-3 bg-light rounded">
+          <h4 class="font-italic">Photo</h4>
+          <div class="col-auto d-none d-lg-block">
+            <img src="/media/{{post.thumbnail}}" class="bd-placeholder-img"  aria-label="Placeholder: Thumbnail">
+            <title>Placeholder</title></img>
+          </div>
+        </div>
+  
+        <div class="p-4">
+          <h4 class="font-italic">Elsewhere</h4>
+          <ol class="list-unstyled">
+            <li><a href="#">GitHub</a></li>
+            <li><a href="#">Twitter</a></li>
+            <li><a href="#">Facebook</a></li>
+          </ol>
+        </div>
+      </aside><!-- /.blog-sidebar -->
+  
+    </div><!-- /.row -->
+  
+  </main>
+{%endblock%}
