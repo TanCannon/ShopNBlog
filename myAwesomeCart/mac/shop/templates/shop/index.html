@@ -68,15 +68,16 @@ bottom: auto;
             {% for i in product %}
             <div class="col-xs-3 col-sm-3 col-md-3" style="height:500px;">
               <div class="card" style="width: 18rem; align-items: center;">
-                <img src='/media/{{i.image}}' class="card-img-top" alt="...">
+                <img src='/media/{{i.image}}' class="card-img-top" alt="{{i.product_name}}" >
                 <div class="card-body">
+
                   {% if i.product_name|length > 20 %}
                   <h5 class="card-title" id="namepr{{i.id}}">{{i.product_name|slice:"0:17"}}...</h5>
                   {% else %}
                   <h5 class="card-title" id="namepr{{i.id}}">{{i.product_name}}</h5>
                   {% endif %}
 
-                  <p class="card-text">{{i.desc|slice:"0:53"}}...</p>
+                  <p class="card-text">{{i.desc|slice:"0:53"|safe}}...</p>
                   <p class="card-text"><b>MRP: Rs <span id="pricepr{{i.id}}">{{i.price}}</span></b></p>
 
                   <span id="divpr{{i.id}}" class="divpr">
