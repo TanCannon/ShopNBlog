@@ -17,8 +17,8 @@ More screenshots [here](https://github.com/TanCannon/ShopNBlog/tree/master/scree
 
 ## Run
 
-In mac folder,
-write in terminal
+In mac folder, write in terminal
+
 python manage.py runserver
     
 ## Issues
@@ -28,5 +28,6 @@ The game window is not responsive yet it works okay till a 5 inch laptop further
 ## Future Goals
 
 Make it responsive.
+
 Make different unique carts for different users.
 
