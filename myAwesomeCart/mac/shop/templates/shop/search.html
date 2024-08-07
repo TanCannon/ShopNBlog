@@ -11,9 +11,7 @@ background-color: blue;
   }
 
 .col-md-3 img{
-
-max-width: 227px;
-height: 242px;
+  max-width: 209px;height: 261px;
 }
 
 body .carousel-indicator li{
@@ -24,9 +22,14 @@ body .carousel-indicators{
 bottom: 0;
 }
 
-body .carousel-control-prev-icon,
-body .carousel-control-next-icon{
+body .carousel-control-prev-icon, body .carousel-control-next-icon
+{
 background-color: blue;
+
+}
+
+.carousel-sliderbutton{
+  overflow: auto;
 }
 
 .carousel-control-prev,
@@ -37,7 +40,7 @@ bottom: auto;
  body .no-padding{
  padding-left: 0,
  padding-right: 0;
- }
+ }  
  {% endblock %}
 {% load static %}
 {% block body %}
@@ -46,11 +49,11 @@ bottom: auto;
     {% for product, range, nSlides in allProds %}
     <h5 class="my-4">Flash Sale On {{product.0.category}} - Recommended Items</h5>
     <div id="demo{{forloop.counter}}" class="carousel slide my-3" data-ride="carousel">
-        <ul class="carousel-indicators">
+        <ul class="carousel-indicators mb-0">
           <li data-target="#demo{{forloop.counter}}" data-slide-to="0" class="active"></li>
     
-           {% for i in range %}
-          <li data-target="#demo{{forloop.parentloop.counter}}" data-slide-to="{{i}}" ></li>
+          {% for i in range %}
+            <li data-target="#demo{{forloop.parentloop.counter}}" data-slide-to="{{i}}" ></li>
           {% endfor %}
         </ul>
     
@@ -61,13 +64,19 @@ bottom: auto;
     
     
             {% for i in product %}
-            <div class="col-xs-3 col-sm-3 col-md-3">
-              <div class="card" style="width: 18rem;">
-                <img src='/media/{{i.image}}' class="card-img-top" alt="...">
+            <div class="col-xs-3 col-sm-3 col-md-3" style="height:500px;">
+              <div class="card" style="width: 18rem; align-items: center;">
+                <img src='/media/{{i.image}}' class="card-img-top" alt="{{i.product_name}}" >
                 <div class="card-body">
+
+                  {% if i.product_name|length > 20 %}
+                  <h5 class="card-title" id="namepr{{i.id}}">{{i.product_name|slice:"0:17"}}...</h5>
+                  {% else %}
                   <h5 class="card-title" id="namepr{{i.id}}">{{i.product_name}}</h5>
-                  <p class="card-text">{{i.desc|slice:"0:53"}}...</p>
-                  <p class="card-text"><b>MRP: <span id="pricepr{{i.id}}">{{i.price}}</span></b></p>
+                  {% endif %}
+
+                  <p class="card-text">{{i.desc|slice:"0:53"|safe}}...</p>
+                  <p class="card-text"><b>MRP: Rs <span id="pricepr{{i.id}}">{{i.price}}</span></b></p>
 
                   <span id="divpr{{i.id}}" class="divpr">
                     <button id="pr{{i.id}}" class="btn btn-primary cart">Add To Cart</button>
@@ -78,9 +87,9 @@ bottom: auto;
                 </div>
               </div>
             </div>
-            {% if forloop.counter|divisibleby:4 and forloop.counter > 0 and not forloop.last %}
-          </div><div class="carousel-item">
-            {% endif %}
+              {% if forloop.counter|divisibleby:4 and forloop.counter > 0 and not forloop.last %}
+                </div><div class="carousel-item">
+              {% endif %}
     
             {% endfor %}
         </div>
@@ -90,12 +99,14 @@ bottom: auto;
     </div>
     </div>
         <!-- left and right controls for the slide -->
+      <div class="carousel-sliderbutton">
         <a class="carousel-control-prev" href="#demo{{forloop.counter}}" data-slide="prev">
             <span class="carousel-control-prev-icon"></span>
         </a>
         <a class="carousel-control-next" href="#demo{{forloop.counter}}" data-slide="next">
             <span class="carousel-control-next-icon"></span>
         </a>
+      </div>
         {% endfor %}
     </div>
      {% endblock %}
@@ -104,6 +115,8 @@ bottom: auto;
 <script>
 console.log('working');
 //var cart is a json
+
+//this is where i can fetch cart data from the database(not yet made!)
 if(localStorage.getItem('cart')==null){ //we're saving the cart value in localstoarge of the website.
   var cart = {};
 }
@@ -153,14 +166,10 @@ function updateCart(cart){
   //updating the item cards (to have + and - buttons) that have been added to the cart.
   for (var item in cart){
     //console.log(item);
-    try{
     document.getElementById('div'+item).innerHTML="<button id='minus"+item+"' class='btn btn-primary minus'>-</button> <span id='val"+item+"'> "+cart[item][0]+" </span> <button id='plus"+item+"' class='btn btn-primary plus'>+</button>";
-    }
-    catch(err){
-      console.log(err);
-    }
   }
   //SETTING THE VALUE OF VARIBALE CART TO THE localstoarge
+  //this below line is where i can send the cart data to database(not yet made!)
   localStorage.setItem('cart', JSON.stringify(cart));
 
   document.getElementById('cart').innerHTML = Object.keys(cart).length;
@@ -191,13 +200,9 @@ function updatePopover(cart){
   var popStr = "";
   var count = 1;
   popStr = popStr + "<b>Your Cart</b><br>";
+  
   for (var item in cart){
-    try{
     popStr = popStr + "<h>"+ count + ". " + cart[item][1] + " Qty:"+ cart[item][0] +"</h>" + "<br>";  
-    }
-    catch(err){
-      console.log(err);
-    }
     count++; 
   }
   popStr = popStr + "<a href='/shop/checkout/'<button id ='checkout' class='btn btn-primary my-1'>Checkout</button></a><button onclick='clearCart()' id ='clearCart' class='btn btn-primary my-1 mx-1'>Clear Cart</button>";
@@ -208,12 +213,7 @@ function updatePopover(cart){
 function clearCart() {
   cart = JSON.parse(localStorage.getItem('cart'));
   for (var item in cart) {
-    try{
       document.getElementById('div' + item).innerHTML = '<button id="' + item + '" class="btn btn-primary cart">Add To Cart</button>'
-    }
-    catch(err){
-      //console.log(err);
-    }
   }
   localStorage.clear();
   cart = {};

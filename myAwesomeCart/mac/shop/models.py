@@ -4,7 +4,7 @@ from django.db import models
 class Products(models.Model):
     #define kro needed attribute datatype
     product_id = models.AutoField
-    product_name = models.CharField(max_length=50)
+    product_name = models.CharField(max_length=200)
     category = models.CharField(max_length=50,default="")
     subcategory = models.CharField(max_length=50, default="")
     price = models.IntegerField(default=0)

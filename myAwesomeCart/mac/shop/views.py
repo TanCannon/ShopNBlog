@@ -38,7 +38,7 @@ def index(requests):
 
 #to check the words present in query and items fetched from the database one by one
 def searchMatch(query, item):
-    if (query in item.desc.lower() or query in item.product_name.lower() or query in item.category.lower()):
+    if (query in item.product_name.lower() or query in item.category.lower()):
         return True
     
 def search(requests):
