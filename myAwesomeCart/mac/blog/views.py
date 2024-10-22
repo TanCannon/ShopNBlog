@@ -115,10 +115,10 @@ def postComment(requests):
         postId = requests.POST.get("postId")
         #in which comment is this comment has been made
         parentId = requests.POST.get("parentId")
-        parent = BlogComment.objects.get(comment_id = parentId)
         
         post = Blogpost.objects.get(post_id= postId)
         if (parentId != ""): #i.e it a comment to another comment (a reply)
+            parent = BlogComment.objects.get(comment_id = parentId) #then need a parent id
             comment = BlogComment( comment = comment, user = user, post = post, parent = parent)
             comment.save()
             messages.success(requests, "Your reply has been posted successfully")

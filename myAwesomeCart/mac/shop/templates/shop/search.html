@@ -164,9 +164,13 @@ $('#popcart').popover();
 
 function updateCart(cart){
   //updating the item cards (to have + and - buttons) that have been added to the cart.
+
+  //console.log(cart)
   for (var item in cart){
     //console.log(item);
-    document.getElementById('div'+item).innerHTML="<button id='minus"+item+"' class='btn btn-primary minus'>-</button> <span id='val"+item+"'> "+cart[item][0]+" </span> <button id='plus"+item+"' class='btn btn-primary plus'>+</button>";
+    if (document.getElementById('div'+item)!=null){
+    document.getElementById('div'+item).innerHTML="<button id='minus"+item+"' class='btn btn-primary minus'>-</button> <span id='val"+item+"'> "+cart[item][0]+" </span> <button id='plus"+item+"' class='btn btn-primary plus'>+</button>"
+    }
   }
   //SETTING THE VALUE OF VARIBALE CART TO THE localstoarge
   //this below line is where i can send the cart data to database(not yet made!)
@@ -213,7 +217,9 @@ function updatePopover(cart){
 function clearCart() {
   cart = JSON.parse(localStorage.getItem('cart'));
   for (var item in cart) {
+      if (document.getElementById('div' + item) != null){
       document.getElementById('div' + item).innerHTML = '<button id="' + item + '" class="btn btn-primary cart">Add To Cart</button>'
+      }
   }
   localStorage.clear();
   cart = {};
